@@ -14,6 +14,7 @@ class UserManager(BaseUserManager):
 
 
 class AuthUser(AbstractBaseUser, PermissionsMixin):
+    """AuthUser class in the system"""
     ROLES = (
         (1, 'Super Admin'),
         (2, 'Normal User'),
