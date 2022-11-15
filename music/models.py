@@ -11,6 +11,7 @@ class SubGenre(models.Model):
     """Subgenre class in the system"""
     name = models.CharField(max_length=255)
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
+
 class Album(models.Model):
     """Album class in the system"""
     title = models.CharField(max_length=255)
@@ -26,7 +27,6 @@ class Artist(models.Model):
     auth_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     about = models.CharField(max_length=255)
     monthly_listeners = models.IntegerField(default=0)
-
     
 class Track(models.Model):
     """Track class in the system"""
@@ -60,7 +60,4 @@ class Playlist(models.Model):
     owner = models.ManyToManyField(settings.AUTH_USER_MODEL)
     like_count = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    
-    
-
     
