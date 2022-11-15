@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.conf import settings
 
 class UserManager(BaseUserManager):
     """Manager for user"""
@@ -26,3 +27,31 @@ class AuthUser(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['role']
+    
+class PremiumPlan(models.Model):
+    """PremiumPlan class in the system"""
+    type = models.CharField(max_length=255)
+    duration = models.IntegerField()
+    
+class NormalUser(models.Model):
+    """NormalUser class in the system"""
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    auth_user = models.ForeignKey(AuthUser, on_delete=models.CASCADE)
+    premium_plan = models.ForeignKey(PremiumPlan, on_delete=models.PROTECT , null=True)
+    
+class SuperAdmin(models.Model):
+    """SuperAdmin class in the system"""
+    auth_user = models.ForeignKey(AuthUser, on_delete=models.CASCADE)
+    
+class Artist(models.Model):
+    """Artist class in the system"""
+    name = models.CharField(max_length=255)
+    auth_user = models.ForeignKey(AuthUser, on_delete=models.CASCADE)
+    about = models.CharField(max_length=255)
+    monthly_listeners = models.IntegerField(default=0)
+    
+class Following(models.Model):
+    """Following class in the system"""
+    auth_user_follower = models.ForeignKey(AuthUser, related_name='follower', on_delete=models.CASCADE)
+    auth_user_following = models.ForeignKey(AuthUser, related_name='following', on_delete=models.CASCADE)
