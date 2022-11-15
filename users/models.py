@@ -45,14 +45,6 @@ class SuperAdmin(models.Model):
     """SuperAdmin class in the system"""
     auth_user = models.ForeignKey(AuthUser, on_delete=models.CASCADE)
     
-class Artist(models.Model):
-    """Artist class in the system"""
-    name = models.CharField(max_length=255)
-    albums = models.ManyToManyField(Album)
-    auth_user = models.ForeignKey(AuthUser, on_delete=models.CASCADE)
-    about = models.CharField(max_length=255)
-    monthly_listeners = models.IntegerField(default=0)
-    
 class Following(models.Model):
     """Following class in the system"""
     auth_user_follower = models.ForeignKey(AuthUser, related_name='follower', on_delete=models.CASCADE)

@@ -18,6 +18,15 @@ class Album(models.Model):
     album_cover = models.ImageField()
     released_date = models.DateField()
     duration = models.IntegerField()
+
+class Artist(models.Model):
+    """Artist class in the system"""
+    name = models.CharField(max_length=255)
+    albums = models.ManyToManyField(Album)
+    auth_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    about = models.CharField(max_length=255)
+    monthly_listeners = models.IntegerField(default=0)
+
     
 class Track(models.Model):
     """Track class in the system"""
@@ -28,7 +37,7 @@ class Track(models.Model):
     released_date = models.DateField()
     cover = models.ImageField()
     sub_genre = models.ForeignKey(SubGenre, on_delete=models.RESTRICT)
-    artists = models.ManyToManyField(settings.ARTIST_MODEL)
+    artists = models.ManyToManyField(Artist)
     
 class LikeTrack(models.Model):
     """Like track class in the system"""
@@ -51,8 +60,6 @@ class Playlist(models.Model):
     owner = models.ManyToManyField(settings.AUTH_USER_MODEL)
     like_count = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    
-    
     
     
 
