@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.conf import settings
+from music.models import Album
 
 class UserManager(BaseUserManager):
     """Manager for user"""
@@ -38,8 +39,8 @@ class NormalUser(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     auth_user = models.ForeignKey(AuthUser, on_delete=models.CASCADE)
-    premium_plan = models.ForeignKey(PremiumPlan, on_delete=models.PROTECT , null=True)
-    
+    premium_plan = models.ForeignKey(PremiumPlan, on_delete=models.RESTRICT , null=True)
+    premium_plan_updated_at = models.DateTimeField(null=True)
 class SuperAdmin(models.Model):
     """SuperAdmin class in the system"""
     auth_user = models.ForeignKey(AuthUser, on_delete=models.CASCADE)
@@ -47,6 +48,7 @@ class SuperAdmin(models.Model):
 class Artist(models.Model):
     """Artist class in the system"""
     name = models.CharField(max_length=255)
+    albums = models.ManyToManyField(Album)
     auth_user = models.ForeignKey(AuthUser, on_delete=models.CASCADE)
     about = models.CharField(max_length=255)
     monthly_listeners = models.IntegerField(default=0)
