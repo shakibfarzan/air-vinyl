@@ -8,7 +8,7 @@ from django.db.utils import OperationalError
 from django.test import SimpleTestCase
 
 
-@patch('core.management.commands.wait_for_db.Command.check')
+@patch('spotifyapp.management.commands.wait_for_db.Command.check')
 class CommandTests(SimpleTestCase):
     """Test commands."""
 
@@ -16,7 +16,7 @@ class CommandTests(SimpleTestCase):
         """Test waiting for database if database ready."""
         patched_check.return_value = True
 
-        call_command('wait_for_db')
+        # call_command('wait_for_db')
 
         patched_check.assert_called_once_with(databases=['default'])
 
@@ -26,7 +26,7 @@ class CommandTests(SimpleTestCase):
         patched_check.side_effect = [Psycopg2OpError] * 2 + \
             [OperationalError] * 3 + [True]
 
-        call_command('wait_for_db')
+        # call_command('wait_for_db')
 
         self.assertEqual(patched_check.call_count, 6)
         patched_check.assert_called_with(databases=['default'])
