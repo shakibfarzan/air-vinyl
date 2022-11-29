@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from django.conf import settings
-# from users.models import Artist, AuthUser
+
+from users.models import ROLES, AuthUser
 
 class Genre(models.Model):
     """Genre class in the system"""
@@ -20,13 +20,22 @@ class Album(models.Model):
     released_date = models.DateField()
     duration = models.IntegerField()
 
-class Artist(models.Model):
+class Artist(AuthUser):
     """Artist class in the system"""
     name = models.CharField(max_length=255)
     albums = models.ManyToManyField(Album)
-    auth_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    auth_user = models.OneToOneField(
+        AuthUser,
+        on_delete=models.CASCADE,
+        related_name="artist",
+        primary_key=True,
+        parent_link=True,
+    )
     about = models.CharField(max_length=255)
     monthly_listeners = models.IntegerField(default=0)
+
+    def get_role(self):
+        return ROLES[2]
     
 class Track(models.Model):
     """Track class in the system"""
@@ -42,13 +51,13 @@ class Track(models.Model):
 class LikeTrack(models.Model):
     """Like track class in the system"""
     track = models.ForeignKey(Track, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(AuthUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     
 class LikeAlbum(models.Model):
     """Like album class in the system"""
     album = models.ForeignKey(Album, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(AuthUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     
 class Playlist(models.Model):
@@ -57,7 +66,7 @@ class Playlist(models.Model):
     description = models.CharField(max_length=1023)
     duration = models.IntegerField()
     private = models.BooleanField()
-    owner = models.ManyToManyField(settings.AUTH_USER_MODEL)
+    owner = models.ManyToManyField(AuthUser)
     like_count = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     

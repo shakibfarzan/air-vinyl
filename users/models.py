@@ -1,7 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from django.conf import settings
-from music.models import Album
+
+ROLES = (
+    (1, 'Super Admin'),
+    (2, 'Normal User'),
+    (3, 'Artist')
+)
 
 class UserManager(BaseUserManager):
     """Manager for user"""
@@ -14,14 +18,8 @@ class UserManager(BaseUserManager):
         user.save()
         return user
 
-
 class AuthUser(AbstractBaseUser, PermissionsMixin):
     """AuthUser class in the system"""
-    ROLES = (
-        (1, 'Super Admin'),
-        (2, 'Normal User'),
-        (3, 'Artist')
-    )
     email = models.EmailField(max_length=255, unique=True)
     role = models.IntegerField(choices=ROLES, default=2)
     avatar = models.ImageField()
@@ -34,16 +32,34 @@ class PremiumPlan(models.Model):
     type = models.CharField(max_length=255)
     duration = models.IntegerField()
     
-class NormalUser(models.Model):
+class NormalUser(AuthUser):
     """NormalUser class in the system"""
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    auth_user = models.ForeignKey(AuthUser, on_delete=models.CASCADE)
+    auth_user = models.OneToOneField(
+        AuthUser,
+        on_delete=models.CASCADE,
+        related_name="normal_user",
+        primary_key=True,
+        parent_link=True,
+    )
     premium_plan = models.ForeignKey(PremiumPlan, on_delete=models.RESTRICT , null=True)
     premium_plan_updated_at = models.DateTimeField(null=True)
-class SuperAdmin(models.Model):
+
+    def get_role(self):
+        return ROLES[1]
+class SuperAdmin(AuthUser):
     """SuperAdmin class in the system"""
-    auth_user = models.ForeignKey(AuthUser, on_delete=models.CASCADE)
+    auth_user = models.OneToOneField(
+        AuthUser,
+        on_delete=models.CASCADE,
+        related_name="super_admin",
+        primary_key=True,
+        parent_link=True,
+    )
+
+    def get_role(self):
+        return ROLES[0]
     
 class Following(models.Model):
     """Following class in the system"""
