@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
-from users.models import ROLES, AuthUser
+from users.models import AuthUser
 
 class Genre(models.Model):
     """Genre class in the system"""
@@ -34,8 +34,10 @@ class Artist(AuthUser):
     about = models.CharField(max_length=255)
     monthly_listeners = models.IntegerField(default=0)
 
-    def get_role(self):
-        return ROLES[2]
+    def save(self, *args, **kwargs):
+        if not self.role:
+            self.role = AuthUser.ARTIST
+        super(AuthUser, self).save(*args, **kwargs)
     
 class Track(models.Model):
     """Track class in the system"""

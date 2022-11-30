@@ -1,12 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
-ROLES = (
-    (1, 'Super Admin'),
-    (2, 'Normal User'),
-    (3, 'Artist')
-)
-
 class UserManager(BaseUserManager):
     """Manager for user"""
     def create_user(self, email, username, password, role, avatar, **extra_fields):
@@ -20,6 +14,16 @@ class UserManager(BaseUserManager):
 
 class AuthUser(AbstractBaseUser, PermissionsMixin):
     """AuthUser class in the system"""
+
+    ROLES = (
+    (1, 'Super Admin'),
+    (2, 'Normal User'),
+    (3, 'Artist')
+    )
+    SUPER_ADMIN = 1
+    NORMAL_USER = 2
+    ARTIST = 3
+
     email = models.EmailField(max_length=255, unique=True)
     role = models.IntegerField(choices=ROLES, default=2)
     avatar = models.ImageField()
@@ -34,6 +38,9 @@ class PremiumPlan(models.Model):
     
 class NormalUser(AuthUser):
     """NormalUser class in the system"""
+
+    DEFAULT_FIELDS = ['first_name', 'last_name', 'premium_plan', 'premium_plan_updated_at']
+
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     auth_user = models.OneToOneField(
@@ -46,8 +53,10 @@ class NormalUser(AuthUser):
     premium_plan = models.ForeignKey(PremiumPlan, on_delete=models.RESTRICT , null=True)
     premium_plan_updated_at = models.DateTimeField(null=True)
 
-    def get_role(self):
-        return ROLES[1]
+    def save(self, *args, **kwargs):
+        if not self.role:
+            self.role = AuthUser.NORMAL_USER
+        super(AuthUser, self).save(*args, **kwargs)
 class SuperAdmin(AuthUser):
     """SuperAdmin class in the system"""
     auth_user = models.OneToOneField(
@@ -58,9 +67,10 @@ class SuperAdmin(AuthUser):
         parent_link=True,
     )
 
-    def get_role(self):
-        return ROLES[0]
-    
+    def save(self, *args, **kwargs):
+        if not self.role:
+            self.role = AuthUser.SUPER_ADMIN
+        super(AuthUser, self).save(*args, **kwargs)
 class Following(models.Model):
     """Following class in the system"""
     auth_user_follower = models.ForeignKey(AuthUser, related_name='follower', on_delete=models.CASCADE)
