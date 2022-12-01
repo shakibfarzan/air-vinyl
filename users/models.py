@@ -26,7 +26,7 @@ class AuthUser(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(max_length=255, unique=True)
     role = models.IntegerField(choices=ROLES, default=2)
-    avatar = models.ImageField()
+    avatar = models.ImageField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['role']
