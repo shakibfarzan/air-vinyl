@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 from .models import AuthUser, NormalUser, PremiumPlan
 
 class PremiumPlanSerializer(serializers.ModelSerializer):
@@ -32,7 +32,8 @@ class NormalUserWriteSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Create and return a user with encrypted password."""
-        return get_user_model().objects.create_user(**validated_data)
+        validated_data["password"] = make_password(validated_data["password"])
+        return NormalUser.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         """Update and return user."""
