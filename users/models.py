@@ -25,7 +25,7 @@ class AuthUser(AbstractBaseUser, PermissionsMixin):
     ARTIST = 3
 
     email = models.EmailField(max_length=255, unique=True)
-    role = models.IntegerField(choices=ROLES, default=2)
+    role = models.IntegerField(choices=ROLES, default=NORMAL_USER)
     avatar = models.ImageField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     USERNAME_FIELD = 'email'
