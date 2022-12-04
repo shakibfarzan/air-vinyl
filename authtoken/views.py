@@ -7,4 +7,3 @@ from authtoken.serializer import TokenObtainPairSerializer
 class MyTokenObtainPairView(TokenObtainPairView):
     permission_class = TokenObtainPairSerializer
 
-# Create your views here.
