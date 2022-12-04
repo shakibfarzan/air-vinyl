@@ -75,6 +75,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'spotifyapp.wsgi.application'
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication'
+    ]
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -135,3 +140,5 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.AuthUser'
+
+AUTHENTICATION_BACKENDS = ['authtoken.auth_backends.EmailBackend']
