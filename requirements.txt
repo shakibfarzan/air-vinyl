@@ -7,3 +7,4 @@ sqlparse==0.4.3
 tzdata==2022.6
 Pillow==9.3.0
 djangorestframework_simplejwt
+django-filter
