@@ -1,7 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from django.conf import settings
-from music.models import Album
 
 class UserManager(BaseUserManager):
     """Manager for user"""
@@ -14,17 +12,21 @@ class UserManager(BaseUserManager):
         user.save()
         return user
 
-
 class AuthUser(AbstractBaseUser, PermissionsMixin):
     """AuthUser class in the system"""
+
     ROLES = (
-        (1, 'Super Admin'),
-        (2, 'Normal User'),
-        (3, 'Artist')
+    (1, 'Super Admin'),
+    (2, 'Normal User'),
+    (3, 'Artist')
     )
+    SUPER_ADMIN = 1
+    NORMAL_USER = 2
+    ARTIST = 3
+
     email = models.EmailField(max_length=255, unique=True)
-    role = models.IntegerField(choices=ROLES, default=2)
-    avatar = models.ImageField()
+    role = models.IntegerField(choices=ROLES, default=NORMAL_USER)
+    avatar = models.ImageField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['role']
@@ -34,17 +36,41 @@ class PremiumPlan(models.Model):
     type = models.CharField(max_length=255)
     duration = models.IntegerField()
     
-class NormalUser(models.Model):
+class NormalUser(AuthUser):
     """NormalUser class in the system"""
+
+    DEFAULT_FIELDS = ['first_name', 'last_name', 'premium_plan', 'premium_plan_updated_at']
+
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    auth_user = models.ForeignKey(AuthUser, on_delete=models.CASCADE)
+    auth_user = models.OneToOneField(
+        AuthUser,
+        on_delete=models.CASCADE,
+        related_name="normal_user",
+        primary_key=True,
+        parent_link=True,
+    )
     premium_plan = models.ForeignKey(PremiumPlan, on_delete=models.RESTRICT , null=True)
     premium_plan_updated_at = models.DateTimeField(null=True)
-class SuperAdmin(models.Model):
+
+    def save(self, *args, **kwargs):
+        if not self.role:
+            self.role = AuthUser.NORMAL_USER
+        super(AuthUser, self).save(*args, **kwargs)
+class SuperAdmin(AuthUser):
     """SuperAdmin class in the system"""
-    auth_user = models.ForeignKey(AuthUser, on_delete=models.CASCADE)
-    
+    auth_user = models.OneToOneField(
+        AuthUser,
+        on_delete=models.CASCADE,
+        related_name="super_admin",
+        primary_key=True,
+        parent_link=True,
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.role:
+            self.role = AuthUser.SUPER_ADMIN
+        super(AuthUser, self).save(*args, **kwargs)
 class Following(models.Model):
     """Following class in the system"""
     auth_user_follower = models.ForeignKey(AuthUser, related_name='follower', on_delete=models.CASCADE)

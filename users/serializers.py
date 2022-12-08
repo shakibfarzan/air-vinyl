@@ -16,6 +16,7 @@ class AuthUserWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = AuthUser
         fields = ['email', 'avatar', 'password']
+        extra_kwargs = {'password': {'min_length': 8}}
 
 class NormalUserReadSerializer(serializers.ModelSerializer):
     premium_plan = PremiumPlanSerializer()
@@ -28,7 +29,6 @@ class NormalUserWriteSerializer(serializers.ModelSerializer):
     class Meta(AuthUserWriteSerializer.Meta):
         model = NormalUser
         fields = AuthUserWriteSerializer.Meta.fields + NormalUser.DEFAULT_FIELDS
-        extra_kwargs = {'password': {'min_length': 8}}
 
     def create(self, validated_data):
         """Create and return a user with encrypted password."""
@@ -47,15 +47,12 @@ class NormalUserWriteSerializer(serializers.ModelSerializer):
         return user
 
 class SuperAdminReadSerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(AuthUserReadSerializer.Meta):
         model = SuperAdmin
-        fields = AuthUserReadSerializer.Meta.fields
         
 class SuperAdminWriteSerializer(serializers.ModelSerializer):
     class Meta(AuthUserWriteSerializer.Meta):
         model = SuperAdmin
-        fields = AuthUserWriteSerializer.Meta.fields
-        extra_kwargs = {'password': {'min_length': 8}}
 
     def create(self, validated_data):
         """Create and return a superadmin with encrypted password."""
