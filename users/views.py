@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from rest_framework.filters import OrderingFilter
 from spotifyapp.utils.general import StandardPagination
 from spotifyapp.utils.views import ReadWriteViewMixin
-from users.models import NormalUser
+from users.models import AuthUser, NormalUser
 from users.permissions import IsNormalUser, IsSuperAdmin
 from users.serializers import NormalUserReadSerializer, NormalUserWriteSerializer
 from users.filters import NormalUserFilterSet
@@ -25,6 +25,8 @@ class NormalUserAPIView(viewsets.ModelViewSet, ReadWriteViewMixin):
         return super().get_permissions()
 
     def get_queryset(self):
+        if self.request.user.role == AuthUser.NORMAL_USER:
+            return NormalUser.objects.filter(auth_user__id=self.request.user.id)
         return NormalUser.objects.filter()
 
     def get_object(self):
