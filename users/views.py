@@ -1,13 +1,19 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.filters import OrderingFilter
+from rest_framework.permissions import IsAuthenticated
 from spotifyapp.utils.general import StandardPagination
 from spotifyapp.utils.views import ReadWriteViewMixin
 from users.models import AuthUser, NormalUser
 from users.permissions import IsNormalUser, IsSuperAdmin
-from users.serializers import NormalUserReadSerializer, NormalUserWriteSerializer
+from users.serializers import NormalUserReadSerializer, NormalUserWriteSerializer, PremiumPlanSerializer
 from users.filters import NormalUserFilterSet
 
+class PremiumPlanAPIView(viewsets.ModelViewSet):
+    serializer_class = PremiumPlanSerializer
+    permission_classes = [IsAuthenticated]
+    def get_object(self):
+        return get_object_or_404(self.get_queryset(), pk=self.kwargs.get("pk"))
 
 class NormalUserAPIView(viewsets.ModelViewSet, ReadWriteViewMixin):
     read_serializer = NormalUserReadSerializer

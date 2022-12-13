@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
+from spotifyapp.utils.serializers import EncryptionPasswordSerializer
 from .models import AuthUser, NormalUser, PremiumPlan, SuperAdmin
 
 class PremiumPlanSerializer(serializers.ModelSerializer):
@@ -24,48 +25,17 @@ class NormalUserReadSerializer(serializers.ModelSerializer):
         model = NormalUser
         fields = AuthUserReadSerializer.Meta.fields + NormalUser.DEFAULT_FIELDS
 
-class NormalUserWriteSerializer(serializers.ModelSerializer):
+class NormalUserWriteSerializer(EncryptionPasswordSerializer):
     premium_plan = serializers.PrimaryKeyRelatedField(required=False, queryset=PremiumPlan.objects.all())
     class Meta(AuthUserWriteSerializer.Meta):
         model = NormalUser
         fields = AuthUserWriteSerializer.Meta.fields + NormalUser.DEFAULT_FIELDS
 
-    def create(self, validated_data):
-        """Create and return a user with encrypted password."""
-        validated_data["password"] = make_password(validated_data["password"])
-        return NormalUser.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        """Update and return user."""
-        password = validated_data.pop('password', None)
-        user = super().update(instance, validated_data)
-
-        if password:
-            user.set_password(password)
-            user.save()
-
-        return user
-
 class SuperAdminReadSerializer(serializers.ModelSerializer):
     class Meta(AuthUserReadSerializer.Meta):
         model = SuperAdmin
         
-class SuperAdminWriteSerializer(serializers.ModelSerializer):
+class SuperAdminWriteSerializer(EncryptionPasswordSerializer):
     class Meta(AuthUserWriteSerializer.Meta):
         model = SuperAdmin
 
-    def create(self, validated_data):
-        """Create and return a superadmin with encrypted password."""
-        validated_data["password"] = make_password(validated_data["password"])
-        return SuperAdmin.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        """Update and return superadmin."""
-        password = validated_data.pop('password', None)
-        user = super().update(instance, validated_data)
-
-        if password:
-            user.set_password(password)
-            user.save()
-
-        return user
