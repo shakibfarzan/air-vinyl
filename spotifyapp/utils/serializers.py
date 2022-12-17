@@ -21,3 +21,10 @@ class EncryptionPasswordSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+class ResponseSerializer(serializers.ModelSerializer):
+    response_serializer: serializers.ModelSerializer = None
+
+    def to_representation(self, instance):
+        serializer = self.response_serializer(instance)
+        return serializer.data

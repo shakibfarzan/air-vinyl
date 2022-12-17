@@ -25,9 +25,12 @@ class AuthUser(AbstractBaseUser, PermissionsMixin):
     ARTIST = 3
 
     email = models.EmailField(max_length=255, unique=True)
-    role = models.IntegerField(choices=ROLES, default=NORMAL_USER)
+    role = models.IntegerField(choices=ROLES)
     avatar = models.ImageField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    READ_FIELDS = ['id', 'email', 'role', 'created_at', 'avatar']
+    WRITE_FIELDS = ['email', 'avatar', 'password']
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['role']
     
@@ -57,6 +60,7 @@ class NormalUser(AuthUser):
         if not self.role:
             self.role = AuthUser.NORMAL_USER
         super(AuthUser, self).save(*args, **kwargs)
+    
 class SuperAdmin(AuthUser):
     """SuperAdmin class in the system"""
     auth_user = models.OneToOneField(

@@ -1,17 +1,17 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.filters import OrderingFilter
-from rest_framework.permissions import IsAuthenticated
 from spotifyapp.utils.general import StandardPagination
 from spotifyapp.utils.views import ReadWriteViewMixin
-from users.models import AuthUser, NormalUser
-from users.permissions import IsNormalUser, IsSuperAdmin
-from users.serializers import NormalUserReadSerializer, NormalUserWriteSerializer, PremiumPlanSerializer
+from users.models import AuthUser, NormalUser, PremiumPlan, SuperAdmin
+from users.permissions import IsNormalUser, IsSuperAdmin, IsSuperAdminOrReadOnly
+from users.serializers import NormalUserReadSerializer, NormalUserWriteSerializer, PremiumPlanSerializer, SuperAdminReadSerializer, SuperAdminWriteSerializer
 from users.filters import NormalUserFilterSet
 
 class PremiumPlanAPIView(viewsets.ModelViewSet):
     serializer_class = PremiumPlanSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsSuperAdminOrReadOnly]
+    queryset = PremiumPlan.objects.all()
     def get_object(self):
         return get_object_or_404(self.get_queryset(), pk=self.kwargs.get("pk"))
 
@@ -34,6 +34,18 @@ class NormalUserAPIView(viewsets.ModelViewSet, ReadWriteViewMixin):
         if self.request.user.role == AuthUser.NORMAL_USER:
             return NormalUser.objects.filter(auth_user__id=self.request.user.id)
         return NormalUser.objects.filter()
+
+    def get_object(self):
+        return get_object_or_404(self.get_queryset(), pk=self.kwargs.get("pk"))
+
+class SuperAdminAPIView(viewsets.ModelViewSet, ReadWriteViewMixin):
+    read_serializer = SuperAdminReadSerializer
+    write_serializer = SuperAdminWriteSerializer
+    pagination_class = StandardPagination
+    permission_classes = [IsSuperAdmin]
+    filter_backends = [OrderingFilter]
+    ordering_fields = ['email', 'created_at']
+    queryset = SuperAdmin.objects.all()
 
     def get_object(self):
         return get_object_or_404(self.get_queryset(), pk=self.kwargs.get("pk"))
