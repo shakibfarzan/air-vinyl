@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from spotifyapp.utils.serializers import EncryptionPasswordSerializer, ResponseSerializer
+from airvinyl.utils.serializers import EncryptionPasswordSerializer, ResponseSerializer
 from .models import AuthUser, NormalUser, PremiumPlan, SuperAdmin
 
 class PremiumPlanSerializer(serializers.ModelSerializer):

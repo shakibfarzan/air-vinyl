@@ -1,5 +1,5 @@
 from django.urls import path
-from spotifyapp.utils.general import LIST_CREATE_MODEL_VIEW_SET, DETAIL_MODEL_VIEW_SET
+from airvinyl.utils.general import LIST_CREATE_MODEL_VIEW_SET, DETAIL_MODEL_VIEW_SET
 from users.views import NormalUserAPIView, PremiumPlanAPIView, SuperAdminAPIView
 
 

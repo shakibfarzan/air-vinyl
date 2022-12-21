@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.filters import OrderingFilter
-from spotifyapp.utils.general import StandardPagination
-from spotifyapp.utils.views import ReadWriteViewMixin
+from airvinyl.utils.general import StandardPagination
+from airvinyl.utils.views import ReadWriteViewMixin
 from users.models import AuthUser, NormalUser, PremiumPlan, SuperAdmin
 from users.permissions import IsNormalUser, IsSuperAdmin, IsSuperAdminOrReadOnly
 from users.serializers import NormalUserReadSerializer, NormalUserWriteSerializer, PremiumPlanSerializer, SuperAdminReadSerializer, SuperAdminWriteSerializer
