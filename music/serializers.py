@@ -3,12 +3,12 @@ from airvinyl.utils.serializers import ResponseSerializer
 from .models import Album, Genre, SubGenre
 
 
-class GenreSerializer(serializers.ModelFieldSerializer):
+class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = '__all__'
 
-class SubGenreSerializer(serializers.ModelFieldSerializer):
+class SubGenreSerializer(serializers.ModelSerializer):
     genre = GenreSerializer()
     class Meta:
         model = SubGenre
