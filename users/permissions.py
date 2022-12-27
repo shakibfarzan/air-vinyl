@@ -13,7 +13,3 @@ class IsNormalUser(IsAuthenticated):
 class IsSuperAdminOrReadOnly(IsSuperAdmin):
     def has_permission(self, request, view):
         return super().has_permission(request, view) or request.method in SAFE_METHODS
-
-class IsArtist(IsAuthenticated):
-    def has_permission(self, request, view):
-        return bool(super().has_permission(request, view) and request.user.role == AuthUser.ARTIST)    

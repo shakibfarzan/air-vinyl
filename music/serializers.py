@@ -15,9 +15,10 @@ class SubGenreSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AlbumReadSerializer(serializers.ModelSerializer):
+    genre = GenreSerializer()
     class Meta:
         model = Album
-        fields = Album.READ_FIELDS
+        fields = '__all__'
         
 class AlbumWriteSerializer(ResponseSerializer):
     response_serializer = AlbumReadSerializer

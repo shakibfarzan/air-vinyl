@@ -26,7 +26,7 @@ class NormalUserAPIView(viewsets.ModelViewSet, ReadWriteViewMixin):
     def get_permissions(self):
         if self.action == 'list':
             self.permission_classes = [IsSuperAdmin]
-        elif self.action in ['retrieve', 'partial_update', 'destroy']:
+        elif self.action in ['retrieve', 'update', 'partial_update', 'destroy']:
             self.permission_classes = [IsSuperAdmin | IsNormalUser] 
         return super().get_permissions()
 
