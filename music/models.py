@@ -19,6 +19,8 @@ class Album(models.Model):
     album_cover = models.ImageField()
     released_date = models.DateField()
     duration = models.IntegerField()
+    
+    WRITE_FIELDS = ['title', 'genre', 'album_cover']
 
 class Artist(AuthUser):
     """Artist class in the system"""
