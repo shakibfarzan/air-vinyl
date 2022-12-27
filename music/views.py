@@ -13,13 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 class GenreAPIView(viewsets.ModelViewSet):
     serializer_class = GenreSerializer
     queryset = Genre.objects.all()
-    
-    def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
-            self.permission_classes = [IsAuthenticated]
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            self.permission_classes = [IsSuperAdminOrReadOnly]
-        return super().get_permissions()
+    permission_classes = [IsSuperAdminOrReadOnly]
     
     def get_object(self):
         return get_object_or_404(self.get_queryset(), pk=self.kwargs.get("pk"))
@@ -27,13 +21,7 @@ class GenreAPIView(viewsets.ModelViewSet):
 class SubGenreAPIView(viewsets.ModelViewSet):
     serializer_class = SubGenreSerializer
     queryset = SubGenre.objects.all()
-    
-    def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
-            self.permission_classes = [IsAuthenticated]
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            self.permission_classes = [IsSuperAdminOrReadOnly]
-        return super().get_permissions()
+    permission_classes = [IsSuperAdminOrReadOnly]
     
     def get_object(self):
         return get_object_or_404(self.get_queryset(), pk=self.kwargs.get("pk"))
