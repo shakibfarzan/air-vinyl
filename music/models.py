@@ -1,6 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-
 from users.models import AuthUser
 
 class Genre(models.Model):
@@ -16,7 +14,7 @@ class Album(models.Model):
     """Album class in the system"""
     title = models.CharField(max_length=255)
     genre = models.ForeignKey(Genre, on_delete=models.RESTRICT)
-    album_cover = models.ImageField()
+    album_cover = models.ImageField(null=True)
     released_date = models.DateField()
     duration = models.IntegerField()
     

@@ -7,7 +7,8 @@ from music.filters import AlbumFilterSet
 from music.models import Album, Genre, SubGenre
 from music.serializers import AlbumReadSerializer, AlbumWriteSerializer, GenreSerializer, SubGenreSerializer
 from users.models import AuthUser
-from users.permissions import IsArtist, IsSuperAdmin, IsSuperAdminOrReadOnly
+from users.permissions import IsSuperAdminOrReadOnly, IsSuperAdmin
+from music.permissions import IsArtist
 from rest_framework.permissions import IsAuthenticated
 
 class GenreAPIView(viewsets.ModelViewSet):
@@ -38,7 +39,7 @@ class AlbumAPIView(viewsets.ModelViewSet, ReadWriteViewMixin):
         if self.action in ['list', 'retrieve']:
             self.permission_classes = [IsAuthenticated]
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            self.permission_classes = [IsArtist]
+            self.permission_classes = [IsArtist | IsSuperAdmin]
         return super().get_permissions()
     
     def get_queryset(self):

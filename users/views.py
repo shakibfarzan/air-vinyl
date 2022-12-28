@@ -42,7 +42,7 @@ class SuperAdminAPIView(viewsets.ModelViewSet, ReadWriteViewMixin):
     read_serializer = SuperAdminReadSerializer
     write_serializer = SuperAdminWriteSerializer
     pagination_class = StandardPagination
-    permission_classes = [IsSuperAdmin]
+    # permission_classes = [IsSuperAdmin]
     filter_backends = [OrderingFilter]
     ordering_fields = ['email', 'created_at']
     queryset = SuperAdmin.objects.all()
