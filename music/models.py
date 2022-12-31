@@ -32,8 +32,10 @@ class Artist(AuthUser):
         parent_link=True,
     )
     about = models.CharField(max_length=255)
-    monthly_listeners = models.IntegerField(default=0)
 
+    READ_FIELDS = ['name', 'albums', 'about']
+    WRITE_FIELDS = ['name', 'about']
+    
     def save(self, *args, **kwargs):
         if not self.role:
             self.role = AuthUser.ARTIST
