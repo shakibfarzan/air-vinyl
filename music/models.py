@@ -17,7 +17,6 @@ class Album(models.Model):
     album_cover = models.ImageField(null=True)
     released_date = models.DateField()
     duration = models.IntegerField()
-    
     WRITE_FIELDS = ['title', 'genre', 'album_cover']
 
 class Artist(AuthUser):
@@ -33,9 +32,16 @@ class Artist(AuthUser):
     )
     about = models.CharField(max_length=255)
 
-    READ_FIELDS = ['name', 'albums', 'about']
+    READ_FIELDS = ['name', 'albums', 'about', 'monthly_listeners']
     WRITE_FIELDS = ['name', 'about']
     
+    def get_monthly_listeners(self):
+        tracks = Track.objects.filter(artists__id=self.auth_user.id)
+        sum_of_played = 0
+        for track in tracks:
+            sum_of_played += track.played_count
+        return sum_of_played
+
     def save(self, *args, **kwargs):
         if not self.role:
             self.role = AuthUser.ARTIST

@@ -9,7 +9,7 @@ from music.serializers import AlbumReadSerializer, AlbumWriteSerializer, ArtistR
 from users.models import AuthUser
 from users.permissions import IsSuperAdminOrReadOnly, IsSuperAdmin
 from music.permissions import IsArtist
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 
 class GenreAPIView(viewsets.ModelViewSet):
     serializer_class = GenreSerializer
@@ -43,7 +43,7 @@ class AlbumAPIView(viewsets.ModelViewSet, ReadWriteViewMixin):
         return super().get_permissions()
     
     def get_queryset(self):
-        if self.request.user == AuthUser.ARTIST:
+        if self.request.user.role == AuthUser.ARTIST:
             return Album.objects.filter(auth_user__id=self.request.user.id)
         return Album.objects.filter()
     
@@ -66,7 +66,7 @@ class ArtistAPIView(viewsets.ModelViewSet, ReadWriteViewMixin):
         return super().get_permissions()
     
     def get_queryset(self):
-        if self.request.user == AuthUser.ARTIST:
+        if self.request.user.role == AuthUser.ARTIST and self.request.method not in SAFE_METHODS:
             return Artist.objects.filter(auth_user__id=self.request.user.id)
         return Artist.objects.filter()
     

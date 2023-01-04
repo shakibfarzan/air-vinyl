@@ -16,9 +16,14 @@ class SubGenreSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ArtistReadSerializer(serializers.ModelSerializer):
+    monthly_listeners = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Artist
         fields = AuthUserReadSerializer.Meta.fields + Artist.READ_FIELDS
+    
+    def get_monthly_listeners(self, obj: Artist):
+        return obj.get_monthly_listeners()
+
         
 class ArtistWriteSerializer(ResponseSerializer):
     response_serializer = ArtistReadSerializer
@@ -27,7 +32,7 @@ class ArtistWriteSerializer(ResponseSerializer):
         fields = AuthUserWriteSerializer.Meta.fields + Artist.WRITE_FIELDS        
         
 class AlbumReadSerializer(serializers.ModelSerializer):
-    artist = ArtistReadSerializer(many=True, read_only=True)
+    artists = ArtistReadSerializer(many=True, read_only=True)
     genre = GenreSerializer()
     class Meta:
         model = Album

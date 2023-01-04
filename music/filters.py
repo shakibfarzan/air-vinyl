@@ -15,11 +15,7 @@ class AlbumFilterSet(FilterSet):
         
 class ArtistFilterSet(FilterSet):
     name = CharFilter(field_name="name", lookup_expr="icontains")
-    albums = CharFilter(method="filter_by_albums", lookup_expr="icontains")
-
-    def filter_by_albums(self, queryset, name, value):
-        return queryset.filter(Q(album__title = value))
     
     class Meta:
         model = Artist
-        fields = ['name', 'albums']
+        fields = ['name']
