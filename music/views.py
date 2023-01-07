@@ -4,11 +4,12 @@ from rest_framework.filters import OrderingFilter
 from airvinyl.utils.general import StandardPagination
 from airvinyl.utils.views import ReadWriteViewMixin
 from music.filters import AlbumFilterSet
-from music.models import Album, Genre, SubGenre
-from music.serializers import AlbumReadSerializer, AlbumWriteSerializer, GenreSerializer, SubGenreSerializer
+from music.models import Album, Artist, Genre, SubGenre
+from music.serializers import AlbumReadSerializer, AlbumWriteSerializer, ArtistReadSerializer, ArtistWriteSerializer, GenreSerializer, SubGenreSerializer
 from users.models import AuthUser
-from users.permissions import IsArtist, IsSuperAdmin, IsSuperAdminOrReadOnly
-from rest_framework.permissions import IsAuthenticated
+from users.permissions import IsSuperAdminOrReadOnly, IsSuperAdmin
+from music.permissions import IsArtist
+from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 
 class GenreAPIView(viewsets.ModelViewSet):
     serializer_class = GenreSerializer
@@ -33,7 +34,7 @@ class AlbumAPIView(viewsets.ModelViewSet, ReadWriteViewMixin):
     filter_backends = [OrderingFilter]
     ordering_fields = ['title', 'release_date', 'genre']
     filterset_class = AlbumFilterSet
-    # queryset = Album.objects.all()
+
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             self.permission_classes = [IsAuthenticated]
@@ -42,9 +43,32 @@ class AlbumAPIView(viewsets.ModelViewSet, ReadWriteViewMixin):
         return super().get_permissions()
     
     def get_queryset(self):
-        if self.request.user == AuthUser.ARTIST:
+        if self.request.user.role == AuthUser.ARTIST:
             return Album.objects.filter(auth_user__id=self.request.user.id)
         return Album.objects.filter()
+    
+    def get_object(self):
+        return get_object_or_404(self.get_queryset(), pk=self.kwargs.get("pk"))
+
+class ArtistAPIView(viewsets.ModelViewSet, ReadWriteViewMixin):
+    read_serializer = ArtistReadSerializer
+    write_serializer = ArtistWriteSerializer    
+    pagination_class = StandardPagination
+    filter_backends = [OrderingFilter]
+    ordering_fields = ['name', 'monthy_listeners']
+    queryset = Artist.objects.all()
+    
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            self.permission_classes = [IsAuthenticated]
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            self.permission_classes = [IsArtist | IsSuperAdmin]
+        return super().get_permissions()
+    
+    def get_queryset(self):
+        if self.request.user.role == AuthUser.ARTIST and self.request.method not in SAFE_METHODS:
+            return Artist.objects.filter(auth_user__id=self.request.user.id)
+        return Artist.objects.filter()
     
     def get_object(self):
         return get_object_or_404(self.get_queryset(), pk=self.kwargs.get("pk"))
