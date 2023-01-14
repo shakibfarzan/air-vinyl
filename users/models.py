@@ -41,9 +41,6 @@ class PremiumPlan(models.Model):
     
 class NormalUser(AuthUser):
     """NormalUser class in the system"""
-
-    DEFAULT_FIELDS = ['first_name', 'last_name', 'premium_plan', 'premium_plan_updated_at']
-
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     auth_user = models.OneToOneField(
@@ -61,6 +58,10 @@ class NormalUser(AuthUser):
             self.role = AuthUser.NORMAL_USER
         super(AuthUser, self).save(*args, **kwargs)
     
+    # FIELD LISTS FOR USING OTHER PLACES
+    DEFAULT_FIELDS = ['first_name', 'last_name', 'premium_plan', 'premium_plan_updated_at']
+    ORDERING_FIELDS = ['email', 'created_at', 'first_name', 'last_name']
+    
 class SuperAdmin(AuthUser):
     """SuperAdmin class in the system"""
     auth_user = models.OneToOneField(
@@ -75,6 +76,9 @@ class SuperAdmin(AuthUser):
         if not self.role:
             self.role = AuthUser.SUPER_ADMIN
         super(AuthUser, self).save(*args, **kwargs)
+    
+    # FIELD LISTS FOR USING OTHER PLACES
+    ORDERING_FILEDS = ['email', 'created_at']
 class Following(models.Model):
     """Following class in the system"""
     auth_user_follower = models.ForeignKey(AuthUser, related_name='follower', on_delete=models.CASCADE)

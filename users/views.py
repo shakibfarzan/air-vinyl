@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.permissions import SAFE_METHODS
 from rest_framework.filters import OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from airvinyl.utils.general import StandardPagination
 from airvinyl.utils.views import ReadWriteViewMixin
 from users.models import AuthUser, NormalUser, PremiumPlan, SuperAdmin
@@ -20,8 +21,8 @@ class NormalUserAPIView(viewsets.ModelViewSet, ReadWriteViewMixin):
     read_serializer = NormalUserReadSerializer
     write_serializer = NormalUserWriteSerializer
     pagination_class = StandardPagination
-    filter_backends = [OrderingFilter]
-    ordering_fields = ['email', 'created_at', 'first_name', 'last_name']
+    filter_backends = [OrderingFilter, DjangoFilterBackend]
+    ordering_fields = NormalUser.ORDERING_FIELDS
     filterset_class = NormalUserFilterSet
 
     def get_permissions(self):
@@ -44,7 +45,7 @@ class SuperAdminAPIView(viewsets.ModelViewSet, ReadWriteViewMixin):
     write_serializer = SuperAdminWriteSerializer
     pagination_class = StandardPagination
     # permission_classes = [IsSuperAdmin]
-    filter_backends = [OrderingFilter]
+    filter_backends = [OrderingFilter, DjangoFilterBackend]
     ordering_fields = ['email', 'created_at']
     queryset = SuperAdmin.objects.all()
 
